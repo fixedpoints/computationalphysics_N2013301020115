@@ -9,9 +9,9 @@ def v(t,dt):
         v[i+1] = v[i] + (a-b*v[i])*dt
     return v
 
-#set the time interval as 30s and the time step as 0.1s
-v_n = v(30,0.1)
-t_n = [0.1*i for i in range(301)]
+#set the time interval as 15s and the time step as 0.1s
+v_n = v(15,0.1)
+t_n = [0.1*i for i in range(151)]
 
 #use scipy to calculate the exact solution of v(t)
 from scipy.integrate import odeint
@@ -22,15 +22,15 @@ t_e = t_n
 sol_v = odeint(dvdt,5,t_e)
 v_e = sol_v[:,0]
 
-#plot the solution
+#plot the solutions
 import matplotlib.pyplot as plt
 import numpy as np
 plt.figure(figsize=(8,6))
 plt.scatter(t_n,v_n,s=5,color='blue',label='numerial')
 plt.plot(t_e,v_e,color='red',label='exact')
-v_ter = [10 for i in range(301)]
+v_ter = [10 for i in range(151)]
 plt.plot(t_e,v_ter,'--',color='green',label='TerminalVelocity')
-plt.xticks(np.linspace(0,30,31,endpoint=True))
+plt.xticks(np.linspace(0,15,16,endpoint=True))
 plt.yticks(np.linspace(5,12,8,endpoint=True))
 plt.xlabel('t/s')
 plt.ylabel('v/(m/s)')
