@@ -101,9 +101,9 @@ def tol_range(theta,v,tol_theta,tol_v,tol_air):
 import random
 import numpy as np
 def tol_range_tv(theta,v):
-    rand = [0.001*random.randint(0,10),
-        0.005*random.randint(0,10),
-        0.01*random.randint(0,10)]
+    rand = [0.001*random.randint(-10,10),
+        0.005*random.randint(-10,10),
+        0.01*random.randint(-10,10)]
     return tol_range(theta,v,rand[0],rand[1],rand[2])
 
 def tol_range_std(theta,v):
