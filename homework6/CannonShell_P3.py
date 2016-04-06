@@ -102,20 +102,20 @@ import random
 import numpy as np
 def tol_range_tv(theta,v):
     rand = [0.001*random.randint(0,10),
-        0.001*random.randint(0,50),
-        0.001*random.randint(0,100)]
+        0.005*random.randint(0,10),
+        0.01*random.randint(0,10)]
     return tol_range(theta,v,rand[0],rand[1],rand[2])
 
 def tol_range_std(theta,v):
     tols = []
-    for i in range(500):
+    for i in range(100):
         tols.append(tol_range_tv(theta,v))
     return np.std(tols)
 
 rand_theta_set = []
 rand_v_set = []
 tol_set = []
-for i in range(500):
+for i in range(100):
     rand_theta = angle_max + 0.01*random.randint(-300,300)
     rand_v = v_min * 0.01 *random.randint(80,120)
     tol_set.append(tol_range_std(rand_theta,rand_v))
