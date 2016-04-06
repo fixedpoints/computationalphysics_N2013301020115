@@ -128,4 +128,5 @@ v_mintol = rand_v_set[index_mintol]
 
 print 'Taking tolerance into consideration, \n\
         firing velocity should be %.2f \n\
-        firing angle should be %.2f.\n'%(v_mintol,theta_mintol)
+        firing angle should be %.2f \n\
+        std is %.5f'%(v_mintol,theta_mintol,tol_min)
