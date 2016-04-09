@@ -92,14 +92,20 @@ for a given altitude and target (x,y), use the best firing angle to find
 the minimun firing velocity
 """
 def min_velocity(x,y):
-    v_test = 1.0*x/range_max*700
-    while range_shell(angle_max,y,v_test) >= x:
-        v_test = 0.9*v_test
+    v_test = round(1.0*x/range_max*700)
     while range_shell(angle_max,y,v_test) < x:
-        v_test = 1.01*v_test
-    v_test = v_test/1.01
-    while range_shell(angle_max,y,v_test) < x:
-        v_test = 1.001*v_test
+        v_test = v_test * 2
+    v_test_0 = v_test
+    pre = 1
+    n = 1
+    while abs(range_shell(angle_max,y,v_test)-x) >= 5:
+        if range_shell(angle_max,y,v_test) < x:
+            pre = pre + 1.0/(2**n)
+            v_test = v_test_0 * pre
+        else:
+            pre = pre - 1.0/(2**n)
+            v_test = v_test_0 * pre
+        n += 1
     return v_test
 
 #input a distance
