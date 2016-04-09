@@ -1,5 +1,6 @@
 """
-calcalute the acceleration caused by the air resistance 
+calcalute the acceleration caused by the air resistance.
+tol means tolerance.
 """
 import math
 def a_air_resistance(v,y,tol=.0):
@@ -46,9 +47,8 @@ def tr_shell(theta_d,dt,altitude=0,v=700,tol_air=.0):
 Altitude = input('please input an altitude within -4000 and 4000 \
 as the altitude of the target.\n')
 while Altitude < -4000 or Altitude > 4000:
-    Altitude = input('please input an altitude within -4000 and 4000.\n')
-
-
+    Altitude = input('please input an altitude wirthin -4000 and 4000.\n')
+    
 #input a distance
 Distance = input("please input a distance between shell and target \n\
 the distance should be 0 to 100000.\n")
@@ -75,58 +75,81 @@ angle_max = angle_l + 0.01*range_set.index(range_max)
 for a given altitude and target (x,y), use the best firing angle to find 
 the minimun firing velocity
 """
+
 def min_velocity(x,y):
-    v_test = 1.0*x/range_max*700
-    while range_shell(angle_max,y,v_test) >= x:
-        v_test = 0.9*v_test
+    v_test = round(1.0*x/range_max*700)
     while range_shell(angle_max,y,v_test) < x:
-        v_test = 1.01*v_test
-    v_test = v_test/1.01
-    while range_shell(angle_max,y,v_test) < x:
-        v_test = 1.001*v_test
+        v_test = v_test * 2
+    v_test_0 = v_test
+    pre = 1
+    n = 1
+    while abs(range_shell(angle_max,y,v_test)-x) >= 5:
+        if range_shell(angle_max,y,v_test) < x:
+            pre = pre + 1.0/(2**n)
+            v_test = v_test_0 * pre
+        else:
+            pre = pre - 1.0/(2**n)
+            v_test = v_test_0 * pre
+        n += 1
     return v_test
 
 #get the minimum velocity under given distance and altitude
 v_min = min_velocity(Distance,Altitude)
 print 'Not taking tolerance into consideration, \n\
-        minimum velocity is %.2f with firing angle %.2f degree \n\
-        when the target is (%d,%d)'%(v_min,angle_max,Distance,Altitude)
+minimum velocity is %.2f with firing angle %.2f degree \n\
+when the target is (%d,%d)'%(v_min,angle_max,Distance,Altitude)
 
 #take tolerance into consider
 def tol_range(theta,v,tol_theta,tol_v,tol_air):
-    return range_shell(theta,Altitude,v)-\
-            range_shell((1+tol_theta)*theta,
-                    Altitude,(1+tol_v)*v,tol_air)
+    return range_shell((1+tol_theta)*theta,
+                    Altitude,(1+tol_v)*v,tol_air) - Distance
 
+#simulate random tolerance
 import random
 import numpy as np
 def tol_range_tv(theta,v):
     rand = [0.001*random.randint(-10,10),
         0.005*random.randint(-10,10),
         0.01*random.randint(-10,10)]
-    return tol_range(theta,v,rand[0],rand[1],rand[2])
+    return tol_range(theta,v,rand[0],rand[1],rand[2]),rand
 
-def tol_range_std(theta,v):
+#calculate root-mean-square tolerance when sample size is 100
+def tol_range_rms(theta,v):
     tols = []
     for i in range(100):
-        tols.append(tol_range_tv(theta,v))
-    return np.std(tols)
+        tols.append(tol_range_tv(theta,v)[0])
+    tols = np.array(tols)
+    return np.sqrt(sum(tols**2))/50
+
+#simulate the process randomly and give the minimum tolerance solution. 
 
 rand_theta_set = []
 rand_v_set = []
 tol_set = []
+
+import time
+begin = time.time()
 for i in range(100):
-    rand_theta = angle_max + 0.01*random.randint(-300,300)
-    rand_v = v_min * 0.01 *random.randint(80,120)
-    tol_set.append(tol_range_std(rand_theta,rand_v))
+    rand_theta = angle_max + 0.01*random.randint(-200,200)
+    rand_v = v_min * 0.01 *random.randint(90,110)
+    tol_set.append(tol_range_rms(rand_theta,rand_v))
     rand_theta_set.append(rand_theta)
     rand_v_set.append(rand_v)
+end = time.time()
+
+tol_set.append(tol_range_rms(angle_max,v_min))
+rand_theta_set.append(angle_max)
+rand_v_set.append(v_min)
+
 tol_min = min(tol_set)
 index_mintol = tol_set.index(tol_min)
 theta_mintol = rand_theta_set[index_mintol]
 v_mintol = rand_v_set[index_mintol]
 
 print 'Taking tolerance into consideration, \n\
-        firing velocity should be %.2f \n\
-        firing angle should be %.2f \n\
-        std is %.5f'%(v_mintol,theta_mintol,tol_min)
+firing velocity should be %.2f \n\
+firing angle should be %.2f \n\
+root-mean-square tolerance is %.5f.\n'%(v_mintol,theta_mintol,tol_min)
+
+print '%d second was taken to simulate \n\
+the effect caused by random tolerance.\n'%(end-begin)
