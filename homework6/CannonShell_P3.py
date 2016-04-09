@@ -151,5 +151,5 @@ firing velocity should be %.2f \n\
 firing angle should be %.2f \n\
 root-mean-square tolerance is %.5f.\n'%(v_mintol,theta_mintol,tol_min)
 
-print '%d second was taken to simulate the effect \n\
+print '%d seconds was taken to simulate the effect \n\
 caused by random tolerance in various velocity and firing angle.\n'%(end-begin)
